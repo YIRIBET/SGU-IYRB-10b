@@ -15,7 +15,7 @@ pipeline {
         stage('Parando los servicios...') {
             steps {
                 sh ''' 
-                    docker compose -p SGU-IYRB-10B down || true
+                    docker compose -p SGU-IYRB-10B || true
                 '''
             }
         }
