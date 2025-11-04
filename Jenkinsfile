@@ -1,34 +1,32 @@
 pipeline {
     agent any
-    environment {
-        PATH = "/opt/homebrew/bin:${env.PATH}"
-    }
+    
     stages {
         stage('Verificar Docker') {
             steps {
-                sh '''
-                    docker --version || echo "Docker no está disponible"
+                bat '''
+                    docker --version || echo Docker no está disponible
                 '''
             }
         }
 
         stage('Parando los servicios...') {
             steps {
-                sh ''' 
-                    docker compose -p SGU-IYRB-10B || true
+                bat ''' 
+                    docker compose -p SGU-IYRB-10B down || exit /b 0
                 '''
             }
         }
 
         stage('Eliminando las imágenes anteriores...') {
             steps {
-                sh ''' 
-                    IMAGES=$(docker images --filter "label=com.docker.compose.project=SGU-IYRB-10B" -q)
-                    if [ -n "$IMAGES" ]; then
-                        docker rmi -f $IMAGES
-                    else
-                        echo "No hay imágenes por eliminar"
-                    fi
+                powershell '''
+                    $images = docker images --filter "label=com.docker.compose.project=SGU-IYRB-10B" -q
+                    if ($images) {
+                        docker rmi -f $images
+                    } else {
+                        Write-Host "No hay imágenes por eliminar"
+                    }
                 '''
             }
         }
@@ -41,7 +39,7 @@ pipeline {
 
         stage('Construyendo y desplegando servicios...') {
             steps {
-                sh '''
+                bat '''
                     docker compose up --build -d
                 '''
             }
@@ -52,11 +50,9 @@ pipeline {
         success {
             echo 'Pipeline ejecutado con éxito'
         }
-
         failure {
             echo 'Hubo un error al ejecutar el pipeline'
         }
-
         always {
             echo 'Pipeline finalizado'
         }
