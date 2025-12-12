@@ -24,7 +24,7 @@ services:
     environment:
       DB_HOST: database
       DB_PORT: 3306
-      DB_NAME: sgu
+      DB_NAME: sgu-demo
       DB_USER: root
       DB_PASS: root
 
